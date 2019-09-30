@@ -27,9 +27,11 @@
   (:import (com.datastax.driver.core Cluster)))
 
 (defn export-table
-  [{:keys [keyspace hosts port fetch-size table-fetch-size null-value consistency]} table-name csv-file]
+  [{:keys [keyspace hosts port fetch-size
+           table-fetch-size null-value consistency
+           read-timeout connect-timeout]} table-name csv-file]
   (println "Exporting" table-name)
-  (with-open [cluster (build-cluster hosts port fetch-size)
+  (with-open [cluster (build-cluster hosts port fetch-size read-timeout connect-timeout)
               session (.connect ^Cluster cluster)
               out-file (io/make-writer csv-file file-encoding)]
     (csv/write-csv out-file (table/export-table cluster
@@ -42,9 +44,11 @@
     (println "Exporting done")))
 
 (defn import-table
-  [{:keys [keyspace hosts port fetch-size null-value consistency]} table-name csv-file]
+  [{:keys [keyspace hosts port fetch-size
+           null-value consistency
+           read-timeout connect-timeout]} table-name csv-file]
   (println "Importing" csv-file)
-  (with-open [cluster (build-cluster hosts port fetch-size)
+  (with-open [cluster (build-cluster hosts port fetch-size read-timeout connect-timeout)
               csv-reader (io/make-reader csv-file file-encoding)]
     (let [[column-names & csv-seq] (csv/read-csv csv-reader)]
       (table/import-table cluster

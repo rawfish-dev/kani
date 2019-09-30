@@ -31,9 +31,11 @@
 (defn export-db
   "Exports both schema definition for the keyspace and the contents of all the tables inside the keyspace into a
   separate CQL file and CSV files in the specified directory"
-  [{:keys [keyspace hosts port fetch-size table-fetch-size null-value consistency excluded-tables]} directory]
+  [{:keys [keyspace hosts port fetch-size table-fetch-size
+           null-value consistency excluded-tables
+           read-timeout connect-timeout]} directory]
   (println (format "\nExporting to '%s'" directory))
-  (with-open [cluster (build-cluster hosts port fetch-size)]
+  (with-open [cluster (build-cluster hosts port fetch-size read-timeout connect-timeout)]
     (print "  Exporting schema... ")
     (flush)
     (let [cql-filename (format "%s/%s.cql" directory keyspace)]
@@ -65,9 +67,11 @@
 (defn import-db
   "Import both schema definition and the contents of all the tables inside the schema from the CQL and CSV files in the
   specified directory into Cassandra database"
-  [{:keys [keyspace hosts port fetch-size null-value consistency excluded-tables]} directory]
+  [{:keys [keyspace hosts port fetch-size
+           null-value consistency excluded-tables
+           read-timeout connect-timeout]} directory]
   (println (format "\nImporting from '%s'" directory))
-  (with-open [cluster (build-cluster hosts port fetch-size)
+  (with-open [cluster (build-cluster hosts port fetch-size read-timeout connect-timeout)
               session (.connect ^Cluster cluster)]
     (print "  Importing schema... ")
     (flush)

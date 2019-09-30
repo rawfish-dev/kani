@@ -5,4 +5,6 @@
  :consistency      :quorum
  :fetch-size       2000
  :table-fetch-size {"reports" 20}
- :excluded-tables  []}
+ :excluded-tables  []
+ :read-timeout     80000
+ :connect-timeout  80000}

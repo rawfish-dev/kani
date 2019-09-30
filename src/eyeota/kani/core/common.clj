@@ -15,7 +15,7 @@
 ;; along with kani.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns eyeota.kani.core.common
-  (:import (com.datastax.driver.core Cluster Metadata KeyspaceMetadata ProtocolOptions TableMetadata QueryOptions)
+  (:import (com.datastax.driver.core Cluster Metadata KeyspaceMetadata ProtocolOptions TableMetadata QueryOptions SocketOptions)
            (java.nio.charset Charset)
            (com.datastax.driver.core.policies ConstantReconnectionPolicy Policies RetryPolicy ReconnectionPolicy)))
 
@@ -26,11 +26,15 @@
 
 (defn build-cluster
   ^Cluster
-  ([addresses port fetch-size]
+  ([addresses port fetch-size read-timeout connect-timeout]
    {:pre [(coll? addresses) (number? port) (number? fetch-size)]}
-   (build-cluster addresses port fetch-size (ConstantReconnectionPolicy. 1000) (Policies/defaultRetryPolicy)))
+   (build-cluster addresses port fetch-size
+                  (ConstantReconnectionPolicy. 1000)
+                  (Policies/defaultRetryPolicy)
+                  (.setReadTimeoutMillis (.setConnectTimeoutMillis (SocketOptions.) read-timeout) connect-timeout)))
   ^Cluster
-  ([addresses port fetch-size ^ReconnectionPolicy reconnection-policy ^RetryPolicy retry-policy]
+  ([addresses port fetch-size ^ReconnectionPolicy reconnection-policy
+    ^RetryPolicy retry-policy ^SocketOptions socket-options]
    {:pre [(coll? addresses) (number? port) (number? fetch-size)]}
    (let [query-options (.setFetchSize (QueryOptions.) fetch-size)]
      (-> (Cluster/builder)
@@ -39,6 +43,7 @@
          (.withReconnectionPolicy reconnection-policy)
          (.withRetryPolicy retry-policy)
          (.withQueryOptions query-options)
+         (.withSocketOptions socket-options)
          (.build)))))
 
 (defn cluster-metadata

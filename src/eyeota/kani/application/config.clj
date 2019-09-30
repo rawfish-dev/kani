@@ -23,5 +23,7 @@
                         :null-value      "<null>"
                         :fetch-size      5000
                         :consistency     :quorum
-                        :excluded-tables []}]
+                        :excluded-tables []
+                        :read-timeout    80000
+                        :connect-timeout 80000}]
     (merge default-config config)))

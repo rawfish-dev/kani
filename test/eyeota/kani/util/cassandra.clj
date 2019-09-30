@@ -26,7 +26,7 @@
 
 (defn embedded-cassandra [f]
   (EmbeddedCassandraServerHelper/startEmbeddedCassandra "cassandra.yml" 40000)
-  (binding [*cluster* (build-cluster ["127.0.0.1"] 19142 2000)]
+  (binding [*cluster* (build-cluster ["127.0.0.1"] 19142 2000 80000 80000)]
     (try
       (f)
       (finally

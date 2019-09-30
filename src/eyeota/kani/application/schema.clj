@@ -25,17 +25,17 @@
 
 (defn export-schema-definition
   "Exports schema definition into a CQL file"
-  [{:keys [keyspace hosts port fetch-size]} cql-file]
+  [{:keys [keyspace hosts port fetch-size read-timeout connect-timeout]} cql-file]
   (println "Exporting" cql-file)
-  (with-open [cluster (build-cluster hosts port fetch-size)]
+  (with-open [cluster (build-cluster hosts port fetch-size read-timeout connect-timeout)]
     (spit cql-file (schema/export-keyspace cluster keyspace))
     (println "Exporting done")))
 
 (defn import-schema-definition
   "Imports schema definition from a CQL file into Cassandra database"
-  [{:keys [hosts port fetch-size]} cql-file]
+  [{:keys [hosts port fetch-size read-timeout connect-timeout]} cql-file]
   (println "Importing" cql-file)
-  (with-open [cluster (build-cluster hosts port fetch-size)
+  (with-open [cluster (build-cluster hosts port fetch-size read-timeout connect-timeout)
               session (.connect ^Cluster cluster)]
     (schema/import-keyspace session (slurp cql-file))
     (println "Importing done")))
